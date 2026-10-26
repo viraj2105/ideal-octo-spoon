@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StaySense uses your listing details to predict the most likely Airbnb room type.">
+  <title>StaySense | Room Type Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header container">
+    <a class="brand" href="#" aria-label="StaySense home">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>Stay<span>Sense</span></span>
+    </a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-line"></span> LISTING CHECK</div>
+      <h1>What kind of<br><em>stay is this?</em></h1>
+      <p class="hero-copy">Share a few details about the property. We’ll compare its profile with familiar room types.</p>
+    </section>
+
+    <section class="workspace">
+      <div class="form-card card">
+        <div class="card-heading">
+          <div>
+            <p class="section-kicker">YOUR PROPERTY</p>
+              <h2>Let’s get to know it</h2>
+          </div>
+          <span class="step-count">01 <i>/</i> 01</span>
+        </div>
+
+        <div class="preset-row">
+          <span>Try an example</span>
+          <button type="button" class="preset active" data-preset="brooklyn">Brooklyn loft</button>
+          <button type="button" class="preset" data-preset="manhattan">Manhattan stay</button>
+          <button type="button" class="preset" data-preset="queens">Queens room</button>
+        </div>
+
+        <form id="predictionForm" novalidate>
+          <div class="form-section">
+            <div class="section-label"><span>01</span> Location</div>
+            <div class="field-grid two">
+              <label class="field">
+                <span>Neighbourhood group</span>
+                <select name="neighbourhood_group" required>
+                  <option value="Brooklyn">Brooklyn</option>
+                  <option value="Manhattan">Manhattan</option>
+                  <option value="Queens">Queens</option>
+                  <option value="Bronx">Bronx</option>
+                  <option value="Staten Island">Staten Island</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Neighbourhood</span>
+                <input name="neighbourhood" type="text" value="Williamsburg" required maxlength="80">
+              </label>
+              <label class="field">
+                <span>Latitude <small>-90 to 90</small></span>
+                <input name="latitude" type="number" value="40.718" min="-90" max="90" step="0.0001" required>
+              </label>
+              <label class="field">
+                <span>Longitude <small>-180 to 180</small></span>
+                <input name="longitude" type="number" value="-73.957" min="-180" max="180" step="0.0001" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-label"><span>02</span> Listing details</div>
+            <div class="field-grid three">
+              <label class="field">
+                <span>Nightly price <small>USD</small></span>
+                <div class="input-prefix"><b>$</b><input name="price" type="number" value="185" min="0.01" step="0.01" required></div>
+              </label>
+              <label class="field">
+                <span>Minimum nights</span>
+                <input name="minimum_nights" type="number" value="3" min="1" max="365" required>
+              </label>
+              <label class="field">
+                <span>Availability <small>days / year</small></span>
+                <input name="availability_365" type="number" value="240" min="0" max="365" required>
+              </label>
+              <label class="field">
+                <span>Total reviews</span>
+                <input name="number_of_reviews" type="number" value="86" min="0" required>
+              </label>
+              <label class="field">
+                <span>Reviews per month</span>
+                <input name="reviews_per_month" type="number" value="1.8" min="0" step="0.1" required>
+              </label>
+              <label class="field">
+                <span>Host listings</span>
+                <input name="calculated_host_listings_count" type="number" value="2" min="0" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <p><span class="lock-icon">✦</span> Your details stay in this browser.</p>
+            <button class="predict-button" type="submit">
+              <span>Predict room type</span><span class="button-arrow">↗</span>
+            </button>
+          </div>
+          <p class="form-error" id="formError" role="alert"></p>
+        </form>
+      </div>
+
+      <aside class="result-card card" id="resultCard" aria-live="polite">
+        <div class="result-topline"><span class="pulse"></span> MODEL OUTPUT <span class="result-time" id="resultTime"></span></div>
+        <div class="result-placeholder" id="resultPlaceholder">
+        <div class="orb"><span>↗</span></div>
+        <h3>Your result<br>will appear here.</h3>
+        <p>Fill in the details on the left and we’ll show the closest match.</p>
+        </div>
+        <div class="result-content hidden" id="resultContent">
+          <p class="result-label">MOST LIKELY ROOM TYPE</p>
+          <h2 id="predictionValue">—</h2>
+          <div class="confidence-wrap">
+            <div class="confidence-heading"><span>Model confidence</span><strong id="confidenceValue">0%</strong></div>
+            <div class="confidence-track"><span id="confidenceBar"></span></div>
+          </div>
+          <div class="probability-list" id="probabilityList"></div>
+          <div class="result-note"><span>✦</span><p>Prediction based on the listing signals you provided.</p></div>
+        </div>
+        <div class="loading-content hidden" id="loadingContent">
+          <div class="loader"></div><p>Reading your listing profile<span class="loading-dots">...</span></p>
+        </div>
+      </aside>
+    </section>
+    <p class="footer-note">STAYSENSE <span>•</span> A small signal can reveal a big possibility.</p>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
